@@ -1,0 +1,10 @@
+services:
+  - type: web
+      name: ia-quiz-zamora
+          env: node
+              plan: free
+                  buildCommand: npm install
+                      startCommand: node server.js
+                          envVars:
+                                - key: FIREBASE_SERVICE_ACCOUNT
+                                        sync: false
