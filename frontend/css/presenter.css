@@ -1,0 +1,279 @@
+/* ==============================================
+   PRESENTER — Quiz IA Zamora Company v1.4.0
+   Pantalla de proyección para el anfitrión
+   ============================================== */
+
+:root {
+  --c1: #881A43;  /* Vino      */
+  --c2: #017258;  /* Verde     */
+  --c3: #C19230;  /* Ocre      */
+  --c4: #267A83;  /* Petróleo  */
+  --opt-a: #881A43;
+  --opt-b: #017258;
+  --opt-c: #C19230;
+  --opt-d: #267A83;
+  --glass: rgba(255,255,255,0.10);
+  --glass-b: rgba(255,255,255,0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100vw; height: 100vh; overflow: hidden;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: url('../assets/bg.jpg') center/cover no-repeat fixed;
+  color: #fff;
+}
+
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.60);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 0;
+}
+
+/* ── VISTAS ────────────────────────────────── */
+.p-view {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1; padding: 32px 40px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .35s ease;
+}
+.p-view.active { opacity: 1; pointer-events: all; }
+
+/* ══════════════════════════════════════════════
+   VISTA ESPERA
+══════════════════════════════════════════════ */
+.p-logo-row {
+  position: absolute; top: 28px; left: 40px;
+  display: flex; align-items: center; gap: 14px;
+}
+.p-logo { height: 52px; }
+.p-brand { display: flex; flex-direction: column; }
+.p-brand-name { font-size: 18px; font-weight: 800; color: #fff; }
+.p-version { font-size: 11px; color: rgba(255,255,255,.5); font-weight: 600; }
+
+.p-waiting-center {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 18px; text-align: center;
+}
+.p-waiting-pin-label {
+  font-size: 18px; font-weight: 600;
+  color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: 3px;
+}
+.p-waiting-pin {
+  font-size: clamp(80px, 14vw, 160px);
+  font-weight: 900; letter-spacing: 20px;
+  color: var(--c3);
+  text-shadow: 0 0 60px rgba(193,146,48,.5);
+  line-height: 1;
+}
+.p-waiting-qr img {
+  width: 200px; height: 200px;
+  border: 4px solid var(--glass-b); border-radius: 16px;
+}
+.p-player-count-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--glass); border: 1px solid var(--glass-b);
+  border-radius: 60px; padding: 12px 28px; backdrop-filter: blur(10px);
+}
+.p-player-icon { font-size: 28px; }
+.p-player-count-num { font-size: 42px; font-weight: 900; color: var(--c3); }
+.p-player-label { font-size: 16px; color: rgba(255,255,255,.6); font-weight: 600; }
+
+.p-countdown-row {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(136,26,67,.25); border: 1px solid rgba(136,26,67,.4);
+  border-radius: 60px; padding: 12px 28px; backdrop-filter: blur(10px);
+}
+.p-countdown-label { font-size: 16px; color: rgba(255,255,255,.7); font-weight: 600; }
+.p-countdown-num { font-size: 52px; font-weight: 900; color: var(--c3); }
+
+.p-footer {
+  position: absolute; bottom: 24px;
+  width: 100%; text-align: center;
+}
+.p-quiz-title-footer {
+  font-size: 16px; font-weight: 600;
+  color: rgba(255,255,255,.4); letter-spacing: 1px;
+}
+
+/* ══════════════════════════════════════════════
+   VISTA PREGUNTA
+══════════════════════════════════════════════ */
+.p-question-header {
+  width: 100%;
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 24px; flex-shrink: 0;
+}
+.p-qnum-badge {
+  background: var(--glass); border: 1px solid var(--glass-b);
+  border-radius: 40px; padding: 8px 20px;
+  font-size: 16px; font-weight: 800; white-space: nowrap;
+  backdrop-filter: blur(10px);
+}
+.p-timer-bar-wrap {
+  flex: 1; height: 14px; background: rgba(255,255,255,.12);
+  border-radius: 8px; overflow: hidden; border: 1px solid var(--glass-b);
+}
+.p-timer-bar {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, var(--c2), var(--c3));
+  border-radius: 8px;
+  transition: width 1s linear, background .5s;
+}
+.p-timer-bar.warning { background: linear-gradient(90deg, var(--c1), #c04020); }
+.p-timer-num {
+  font-size: 42px; font-weight: 900;
+  color: var(--c3); min-width: 60px; text-align: center;
+}
+
+.p-question-text {
+  width: 100%; text-align: center;
+  font-size: clamp(26px, 3.5vw, 52px);
+  font-weight: 800; line-height: 1.3;
+  margin-bottom: 28px; flex-shrink: 0;
+  text-shadow: 0 2px 20px rgba(0,0,0,.4);
+}
+
+/* Grid opciones */
+.p-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px; width: 100%;
+}
+.p-option {
+  display: flex; align-items: center; gap: 16px;
+  border-radius: 18px; padding: 18px 24px;
+  font-size: clamp(16px, 2vw, 26px);
+  font-weight: 700; line-height: 1.3;
+  border: 2px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(12px);
+  transition: opacity .3s, transform .2s;
+  cursor: default;
+}
+.p-option:nth-child(1) { background: rgba(136,26,67,.6); }
+.p-option:nth-child(2) { background: rgba(1,114,88,.6); }
+.p-option:nth-child(3) { background: rgba(193,146,48,.6); }
+.p-option:nth-child(4) { background: rgba(38,122,131,.6); }
+.p-option-icon { font-size: 28px; flex-shrink: 0; }
+.p-option-text { flex: 1; }
+
+/* Opciones reveladas */
+.p-options-grid.revealed .p-option.wrong {
+  opacity: 0.28; transform: scale(.97);
+}
+.p-options-grid.revealed .p-option.correct {
+  border-color: #5ff0c0;
+  box-shadow: 0 0 30px rgba(1,114,88,.5);
+  transform: scale(1.03);
+}
+
+.p-answered-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 16px; flex-shrink: 0;
+  background: var(--glass); border: 1px solid var(--glass-b);
+  border-radius: 40px; padding: 8px 24px;
+  backdrop-filter: blur(10px);
+}
+.p-answered-icon { font-size: 20px; }
+.p-answered-num { font-size: 30px; font-weight: 900; color: var(--c3); }
+.p-answered-label { font-size: 14px; color: rgba(255,255,255,.6); font-weight: 600; }
+
+/* ══════════════════════════════════════════════
+   VISTA RESPUESTA REVELADA
+══════════════════════════════════════════════ */
+.p-answer-header { margin-bottom: 20px; flex-shrink: 0; }
+.p-answer-verdict {
+  font-size: 28px; font-weight: 900;
+  padding: 12px 32px; border-radius: 50px;
+  background: var(--glass); border: 1px solid var(--glass-b);
+  backdrop-filter: blur(10px);
+}
+.p-mini-ranking {
+  margin-top: 20px; width: 100%; max-width: 700px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.p-mini-rank-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--glass); border: 1px solid var(--glass-b);
+  border-radius: 12px; padding: 10px 18px;
+  backdrop-filter: blur(10px);
+  animation: slideIn .3s ease both;
+}
+.p-mini-medal { font-size: 24px; min-width: 30px; text-align: center; }
+.p-mini-name { flex: 1; font-size: 18px; font-weight: 700; }
+.p-mini-score { font-size: 22px; font-weight: 900; color: var(--c3); }
+@keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:none} }
+
+/* ══════════════════════════════════════════════
+   VISTA GAME OVER / PODIO
+══════════════════════════════════════════════ */
+.p-gameover-header {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 24px; gap: 8px;
+}
+.p-trophy { font-size: 72px; animation: bounce .6s ease infinite alternate; }
+@keyframes bounce { from{transform:translateY(0)} to{transform:translateY(-12px)} }
+.p-gameover-title {
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 900; text-align: center;
+}
+
+.p-podium {
+  display: flex; align-items: flex-end; gap: 12px;
+  margin-bottom: 24px; justify-content: center;
+}
+.p-podium-place {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; flex: 1; max-width: 200px;
+}
+.p-podium-medal { font-size: 36px; }
+.p-podium-name {
+  font-size: clamp(13px, 1.5vw, 18px); font-weight: 800;
+  text-align: center; word-break: break-word;
+}
+.p-podium-score { font-size: 16px; color: var(--c3); font-weight: 700; }
+.p-podium-bar {
+  width: 100%; border-radius: 12px 12px 0 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 900; color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+.p-podium-place:nth-child(1) .p-podium-bar { background: var(--c1); height: 100px; }
+.p-podium-place:nth-child(2) .p-podium-bar { background: var(--c2); height: 140px; }
+.p-podium-place:nth-child(3) .p-podium-bar { background: var(--c4); height: 75px; }
+
+.p-full-ranking {
+  width: 100%; max-width: 800px;
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 260px; overflow-y: auto;
+}
+.p-rank-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--glass); border: 1px solid var(--glass-b);
+  border-radius: 10px; padding: 8px 16px;
+  backdrop-filter: blur(8px);
+  animation: slideIn .3s ease both;
+}
+.p-rank-pos { font-size: 16px; font-weight: 800; min-width: 28px; color: rgba(255,255,255,.5); }
+.p-rank-name { flex: 1; font-size: 16px; font-weight: 700; }
+.p-rank-score { font-size: 20px; font-weight: 900; color: var(--c3); }
+.p-rank-row:nth-child(1) .p-rank-name { color: var(--c3); }
+
+/* ── BOTÓN MUTE ────────────────────────── */
+.btn-mute {
+  position: fixed; top: 28px; right: 40px;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--glass); border: 1px solid var(--glass-b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; cursor: pointer; backdrop-filter: blur(10px);
+  z-index: 1000; transition: all .2s;
+}
+.btn-mute:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+.btn-mute:active { transform: scale(0.9); }
+

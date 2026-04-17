@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Quiz Zamora Company — Jugador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-row">
+        <span class="logo-g">A</span>
+        <span class="logo-o1">I</span>
+        <span class="logo-quiz">Quiz</span>
+      </div>
+      <div class="app-name-row">
+        <span class="app-name">Zamora Company</span>
+      </div>
+    </header>
+
+    <!-- VIEW: LOGIN -->
+    <div id="view-login">
+      <div class="login-card">
+        <div class="join-box">
+          <input type="number" id="input-pin" placeholder="PIN de partida" maxlength="6">
+          <input type="text" id="input-nickname" placeholder="Tu Nombre">
+          <button id="btn-join" class="btn btn-primary">¡Entrar!</button>
+          <p id="error-msg" style="display:none; color:#ea4335; font-size:12px; margin-top:10px; font-weight:700;"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: WAITING -->
+    <div id="view-waiting" style="display:none;">
+      <div class="waiting-card">
+        <div id="waiting-loader" class="spinner"></div>
+        <h2>¡Te has unido, <span id="display-name">...</span>!</h2>
+        <p>PIN: <span id="display-pin">....</span></p>
+        <p>Espera a que el presentador inicie la partida...</p>
+        <div id="countdown-box" style="display:none; margin-top:20px;">
+          <h1 id="countdown-number" style="font-size: 60px; color: var(--c1);">5</h1>
+        </div>
+        <p style="margin-top:20px; font-size:12px; color:var(--g-gray);">Jugadores en sala: <span id="player-count">0</span></p>
+      </div>
+    </div>
+
+    <!-- VIEW: QUESTION -->
+    <div id="view-question" style="display:none;">
+      <div class="question-header">
+        <span id="question-counter">Pregunta 1 de 10</span>
+        <div class="timer-circle">
+          <span id="time-left">0</span>
+        </div>
+        <div id="progress-bar" style="width:100%; height:8px; background:#eee; border-radius:4px; margin:10px 0;">
+          <div id="progress-fill" style="width:0%; height:100%; background:var(--c2); border-radius:4px; transition:width 0.3s;"></div>
+        </div>
+      </div>
+      <h2 id="question-text">¿Cargando pregunta?</h2>
+      <div id="options-grid" class="options-grid"></div>
+    </div>
+
+    <!-- VIEW: FEEDBACK -->
+    <div id="view-feedback" style="display:none;">
+      <div id="feedback-card" class="feedback-card">
+        <div id="feedback-icon" class="feedback-icon"></div>
+        <h2 id="feedback-msg">¡Respuesta recibida!</h2>
+        <p id="feedback-points" style="font-size:24px; font-weight:900;"></p>
+        <p>Espera a la siguiente pregunta...</p>
+      </div>
+    </div>
+
+    <!-- VIEW: GAMEOVER -->
+    <div id="view-gameover" style="display:none;">
+      <div class="gameover-card">
+        <h2>🏆 ¡Fin de la partida!</h2>
+        <p>Excelente participación.</p>
+        
+        <!-- Podio para el móvil (opcional pero lo dejamos preparado) -->
+        <div class="mini-podium" style="display:none;">
+          <div id="podium-2"><p id="podium-name-2"></p><p id="podium-score-2"></p></div>
+          <div id="podium-1"><p id="podium-name-1"></p><p id="podium-score-1"></p></div>
+          <div id="podium-3"><p id="podium-name-3"></p><p id="podium-score-3"></p></div>
+        </div>
+
+        <ul id="ranking-list" class="ranking-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOCKET.IO & APP -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

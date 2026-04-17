@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrador — AI Quiz Zamora Company v1.7.1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+
+  <!-- ==================== LOGIN ==================== -->
+  <div id="admin-login" class="admin-login">
+    <div class="login-card">
+      <div class="login-logo">🔐</div>
+      <h1>Panel de Administrador</h1>
+      <p class="login-subtitle">AI Quiz Zamora Company · v1.8.0</p>
+      
+      <div class="login-form-simple" style="margin-top: 25px;">
+        <input type="password" id="admin-pass-input" placeholder="Código de acceso administrador" 
+               style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; margin-bottom: 15px; text-align: center; font-size: 16px;">
+        <button onclick="simpleLogin()" class="btn btn-save" style="width: 100%; margin: 0; padding: 12px; font-weight: 800;">Entrar al Panel</button>
+      </div>
+      
+      <p id="login-error" class="login-error" style="display:none; margin-top:15px;"></p>
+    </div>
+  </div>
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <div id="admin-dashboard" class="admin-dashboard" style="display:none;">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-text">AI Quiz</span>
+      </div>
+      <p class="sidebar-app">Zamora Company</p>
+      <span class="sidebar-badge">Admin · v1.8.0</span>
+
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-tab="tab-history"   onclick="showTab('tab-history',this)">📋 Historial</button>
+        <button class="nav-btn"        data-tab="tab-current"   onclick="showTab('tab-current',this)">🟢 Partida Activa</button>
+        <button class="nav-btn"        data-tab="tab-quizzes"   onclick="showTab('tab-quizzes',this)">📝 Editor de Quizzes</button>
+        <button class="nav-btn"        data-tab="tab-session"   onclick="showTab('tab-session',this)">🚀 Nueva Partida</button>
+        <button class="nav-btn"        data-tab="tab-stats"     onclick="showTab('tab-stats',this)">📊 Estadísticas</button>
+        <button class="nav-btn"        data-tab="tab-backup"    onclick="showTab('tab-backup',this)">💾 Backups</button>
+      </nav>
+
+      <button class="btn-logout" onclick="logout()">← Cerrar Sesión</button>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- ── HISTORIAL ──────────────────────────────────────────── -->
+      <section id="tab-history" class="tab active">
+        <div class="tab-header">
+          <h2>📋 Historial de Partidas</h2>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-export" onclick="exportAllCSV()" style="margin-top:0;">⬇ Exportar Todo</button>
+            <button class="btn btn-refresh" onclick="loadHistory()">↻ Actualizar</button>
+          </div>
+        </div>
+        <p class="tab-desc">Registro completo de todas las sesiones finalizadas. Clic en una fila para ver el ranking.</p>
+        <div class="filter-bar">
+          <select id="hist-filter-date" class="filter-select" onchange="applyHistoryFilters()">
+            <option value="all">🕒 Desde siempre</option>
+            <option value="1m">Último Mes</option>
+            <option value="3m">Últimos 3 Meses</option>
+            <option value="6m">Últimos 6 Meses</option>
+            <option value="year">Este Año</option>
+          </select>
+          <select id="hist-filter-quiz" class="filter-select" onchange="applyHistoryFilters()">
+            <option value="all">📚 Todos los Cuestionarios</option>
+          </select>
+        </div>
+        <div id="history-loading" class="loading-msg">Cargando historial...</div>
+        <div id="history-empty"   class="empty-msg"   style="display:none;">Aún no hay partidas finalizadas.</div>
+        <div id="sessions-grid"   class="sessions-grid"></div>
+        <div id="session-detail"  class="session-detail" style="display:none;">
+          <div class="detail-header">
+            <h3 id="detail-title">Ranking</h3>
+            <button class="btn-close" onclick="closeDetail()">✕</button>
+          </div>
+          <div id="detail-meta" class="detail-meta"></div>
+          <table id="detail-table" class="ranking-table">
+            <thead><tr><th>#</th><th>Jugador</th><th>Puntuación</th><th>Aciertos</th><th>% Éxito</th></tr></thead>
+            <tbody id="detail-tbody"></tbody>
+          </table>
+          <button class="btn btn-export" onclick="exportCSV()">⬇ Exportar CSV</button>
+        </div>
+      </section>
+
+      <!-- ── ESTADÍSTICAS ────────────────────────────────────────── -->
+      <section id="tab-stats" class="tab" style="display:none;">
+        <div class="tab-header">
+          <h2>📊 Estadísticas Globales</h2>
+          <button class="btn btn-refresh" onclick="loadStats()">↻ Actualizar</button>
+        </div>
+        <p class="tab-desc">Consulta el rendimiento general y el impacto de los cuestionarios en los participantes.</p>
+        <div class="filter-bar">
+          <select id="stats-filter-date" class="filter-select" onchange="loadStats()">
+            <option value="all">🕒 Desde siempre</option>
+            <option value="1m">Último Mes</option>
+            <option value="3m">Últimos 3 Meses</option>
+            <option value="6m">Últimos 6 Meses</option>
+            <option value="year">Este Año</option>
+          </select>
+          <select id="stats-filter-quiz" class="filter-select" onchange="loadStats()">
+            <option value="all">📚 Todos los Cuestionarios</option>
+          </select>
+        </div>
+        
+        <div id="stats-loading" class="loading-msg">Midiendo el éxito...</div>
+        <div id="stats-content" style="display:none;">
+          
+          <h3 class="stats-section-title">KPIs Globales</h3>
+          <div class="stats-kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon">🎮</div>
+              <div class="kpi-data">
+                <div class="kpi-value" id="kpi-sessions">0</div>
+                <div class="kpi-label">Partidas Finalizadas</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">👥</div>
+              <div class="kpi-data">
+                <div class="kpi-value" id="kpi-players">0</div>
+                <div class="kpi-label">Jugadores Totales</div>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">🎯</div>
+              <div class="kpi-data">
+                <div class="kpi-value" id="kpi-avg-score">0</div>
+                <div class="kpi-label">Puntaje Medio Histórico</div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="stats-section-title">Rendimiento por Cuestionario</h3>
+          <table class="ranking-table stats-table">
+            <thead>
+              <tr>
+                <th>Cuestionario</th>
+                <th style="text-align:center;">Sesiones</th>
+                <th style="text-align:center;">Jugadores</th>
+                <th style="text-align:center;">Max Puntuación</th>
+                <th style="text-align:center;">% Acierto Medio</th>
+              </tr>
+            </thead>
+            <tbody id="stats-quiz-tbody">
+              <!-- JS Injected -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── PARTIDA ACTIVA ─────────────────────────────────────── -->
+      <section id="tab-current" class="tab" style="display:none;">
+        <div class="tab-header">
+          <h2>🟢 Partida Activa</h2>
+          <button class="btn btn-refresh" onclick="loadCurrent()">↻ Actualizar</button>
+        </div>
+        <p class="tab-desc">Todas las salas activas en este momento, con su PIN y cuestionario asignado. Compárteles el PIN para que puedan unirse.</p>
+        <div id="current-loading" class="loading-msg">Cargando...</div>
+        <div id="current-empty" class="empty-msg" style="display:none;">
+          💭 No hay salas activas ahora mismo.<br>
+          <span style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px;display:block;">Ve a <strong>Nueva Partida</strong> para crear una sala y asignar un PIN.</span>
+        </div>
+        <div id="current-content" style="display:none;">
+          <div id="current-cards" class="current-cards"></div>
+          
+          <div style="margin-top: 25px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid var(--glass-border); text-align: center;">
+            <h3 style="margin-bottom: 10px;">📺 Pantalla de Proyección</h3>
+            <p class="tab-desc" style="margin-bottom: 15px;">Usa esta vista si vas a proyectar el juego en una sala. Muestra el ranking en tiempo real y la opción correcta.</p>
+            <button class="btn btn-launch" id="btn-open-presenter" style="margin: 0; width: auto; padding: 12px 25px;">Abrir Vista Presentador ↗</button>
+          </div>
+          <!-- QR CODE -->
+          <div class="qr-section">
+            <h3>📱 Código QR de acceso</h3>
+            <p class="tab-desc">Los participantes pueden escanear este código con su móvil para acceder directamente al quiz.</p>
+            <div class="qr-url-row">
+              <input type="text" id="qr-url-input" placeholder="URL del servidor (ej: http://192.168.1.10:3000)" />
+              <button class="btn btn-refresh" onclick="generateQR()">Generar QR</button>
+            </div>
+            <div id="qr-container" class="qr-container" style="display:none;">
+              <img id="qr-image" src="" alt="QR Code" />
+              <p class="qr-hint">Escanea con la cámara del móvil</p>
+            </div>
+          </div>
+          <div class="pin-instructions">
+            <h3>📱 Instrucciones para los participantes</h3>
+            <ol>
+              <li>Abre el navegador en tu móvil u ordenador.</li>
+              <li>Ve a la dirección del servidor (o escanea el QR).</li>
+              <li>Introduce el <strong>PIN</strong> de la sala y tu <strong>Nombre y Apellido</strong>.</li>
+              <li>¡Espera a que el administrador lance el juego!</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── EDITOR DE QUIZZES ──────────────────────────────────── -->
+      <section id="tab-quizzes" class="tab" style="display:none;">
+        <div class="tab-header">
+          <h2>📝 Editor de Quizzes</h2>
+          <button class="btn btn-create" onclick="showCreateQuizForm()">+ Nuevo Quiz</button>
+        </div>
+        <p class="tab-desc">Crea, edita y gestiona tus quizzes y preguntas. Soporta opción múltiple y Verdadero/Falso.</p>
+
+        <!-- Formulario crear quiz -->
+        <div id="create-quiz-form" class="card-form" style="display:none;">
+          <h3>Nuevo Quiz</h3>
+          <input type="text" id="new-quiz-title" placeholder="Título del Quiz" />
+          <div class="form-actions">
+            <button class="btn btn-save" onclick="createQuiz()">💾 Crear</button>
+            <button class="btn btn-cancel" onclick="hideCreateQuizForm()">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="quiz-editor-layout">
+          <!-- Lista de quizzes -->
+          <div class="quiz-list-panel">
+            <h3 class="panel-title">Mis Quizzes</h3>
+            <div id="quizzes-loading" class="loading-msg" style="font-size:13px;">Cargando...</div>
+            <div id="quizzes-list"></div>
+
+            <!-- CARGA MASIVA -->
+            <div class="bulk-load-section">
+              <h4 class="bulk-title">📂 Carga Masiva</h4>
+              <p class="bulk-desc">Sube múltiples preguntas de golpe.</p>
+              <div class="bulk-actions">
+                <button class="btn btn-bulk json" onclick="document.getElementById('file-json').click()">Subir JSON</button>
+                <button class="btn btn-bulk csv" onclick="document.getElementById('file-csv').click()">Subir CSV</button>
+                <input type="file" id="file-json" style="display:none" accept=".json" onchange="handleBulkUpload('json')">
+                <input type="file" id="file-csv" style="display:none" accept=".csv" onchange="handleBulkUpload('csv')">
+              </div>
+              <button class="btn-link" onclick="downloadCSVTemplate()">📥 Descargar plantilla CSV</button>
+            </div>
+          </div>
+
+          <!-- Editor de preguntas -->
+          <div class="quiz-questions-panel">
+            <div id="quiz-editor-placeholder" class="editor-placeholder">
+              <span>👈</span> Selecciona un quiz para editarlo
+            </div>
+            <div id="quiz-editor" style="display:none;">
+              <div class="quiz-editor-header">
+                <div>
+                  <h3 id="quiz-editor-title">Título del Quiz</h3>
+                  <p id="quiz-editor-count" class="editor-count">0 preguntas</p>
+                </div>
+                <button class="btn btn-create" onclick="showAddQuestionForm()">+ Añadir Pregunta</button>
+              </div>
+
+              <!-- Formulario nueva pregunta -->
+              <div id="add-question-form" class="card-form" style="display:none;">
+                <h4>Nueva Pregunta</h4>
+                <textarea id="new-q-text" placeholder="Texto de la pregunta..." rows="3"></textarea>
+                <div class="form-row">
+                  <label>Tipo:
+                    <select id="new-q-type" onchange="toggleBooleanOptions(this.value)">
+                      <option value="multiple">Opción Múltiple</option>
+                      <option value="boolean">Verdadero / Falso</option>
+                    </select>
+                  </label>
+                  <label>Tiempo (seg):
+                    <input type="number" id="new-q-time" value="20" min="5" max="60" style="width:70px;" />
+                  </label>
+                </div>
+                <div id="multiple-options-form">
+                  <p class="options-hint">Opciones (marca cuál es la correcta):</p>
+                  <div id="options-list">
+                    <div class="option-input-row">
+                      <input type="radio" name="correct-opt" value="0" checked /> 
+                      <input type="text" class="opt-text" placeholder="Opción A" />
+                    </div>
+                    <div class="option-input-row">
+                      <input type="radio" name="correct-opt" value="1" />
+                      <input type="text" class="opt-text" placeholder="Opción B" />
+                    </div>
+                    <div class="option-input-row">
+                      <input type="radio" name="correct-opt" value="2" />
+                      <input type="text" class="opt-text" placeholder="Opción C (opcional)" />
+                    </div>
+                    <div class="option-input-row">
+                      <input type="radio" name="correct-opt" value="3" />
+                      <input type="text" class="opt-text" placeholder="Opción D (opcional)" />
+                    </div>
+                  </div>
+                </div>
+                <div id="boolean-options-form" style="display:none; margin-bottom: 12px;">
+                  <p class="options-hint">Opciones (marca cuál es la correcta):</p>
+                  <div class="option-input-row" style="margin-top: 8px;">
+                    <label style="margin-right: 20px; font-size:13px; font-weight:600; cursor:pointer;">
+                      <input type="radio" name="boolean-correct" value="true" checked style="accent-color:var(--g-blue);" /> 
+                      Verdadero
+                    </label>
+                    <label style="font-size:13px; font-weight:600; cursor:pointer;">
+                      <input type="radio" name="boolean-correct" value="false" style="accent-color:var(--g-blue);" /> 
+                      Falso
+                    </label>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-save" onclick="saveNewQuestion()">💾 Guardar Pregunta</button>
+                  <button class="btn btn-cancel" onclick="hideAddQuestionForm()">Cancelar</button>
+                </div>
+              </div>
+
+              <!-- Lista de preguntas del quiz -->
+              <div id="questions-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── NUEVA PARTIDA ──────────────────────────────────────── -->
+      <section id="tab-session" class="tab" style="display:none;">
+        <div class="tab-header"><h2>🚀 Crear Nueva Partida</h2></div>
+        <p class="tab-desc">Sigue los 3 pasos para lanzar un quiz y que los participantes puedan unirse con su móvil.</p>
+
+        <!-- PASO 1: selección de quiz -->
+        <div class="wizard-step" id="step-1">
+          <div class="step-header">
+            <span class="step-badge">1</span>
+            <div>
+              <h3 class="step-title">¿Qué cuestionario quieres usar?</h3>
+              <p class="step-desc">Selecciona uno de tus quizzes guardados</p>
+            </div>
+          </div>
+          <div id="session-quiz-cards" class="quiz-pick-grid">
+            <div class="loading-msg">Cargando quizzes...</div>
+          </div>
+        </div>
+
+        <!-- PASO 2: PIN -->
+        <div class="wizard-step" id="step-2">
+          <div class="step-header">
+            <span class="step-badge">2</span>
+            <div>
+              <h3 class="step-title">Asigna un PIN de acceso</h3>
+              <p class="step-desc">Los participantes usarán este número para entrar a la sala. Puedes dejarlo tal cual o cambiarlo.</p>
+            </div>
+          </div>
+          <div class="pin-input-row">
+            <div class="pin-display" id="pin-preview">1111</div>
+            <input type="number" id="session-pin" value="1111" maxlength="8" min="1000" max="99999"
+              placeholder="Escribe el PIN" oninput="document.getElementById('pin-preview').innerText=this.value||'—'" />
+          </div>
+          <p class="pin-tip">💡 El PIN permite que cada sesión sea independiente. Puedes usar el mismo cuestionario con PINs distintos para diferentes grupos.</p>
+        </div>
+
+        <!-- PASO 3: lanzar -->
+        <div class="wizard-step" id="step-3">
+          <div class="step-header">
+            <span class="step-badge">3</span>
+            <div>
+              <h3 class="step-title">Lanzar la partida</h3>
+              <p class="step-desc">Se creará la sala de espera. Los participantes podrán entrar en cuanto obtengan el PIN.</p>
+            </div>
+          </div>
+          <div class="launch-preview" id="launch-preview">
+            <div class="lp-row"><span class="lp-label">📝 Quiz seleccionado:</span> <strong id="lp-quiz">—</strong></div>
+            <div class="lp-row"><span class="lp-label">🔑 PIN de acceso:</span> <strong id="lp-pin">—</strong></div>
+          </div>
+          <button class="btn btn-launch" id="btn-create-session" onclick="createSession()">🚀 Crear Sala y Lanzar</button>
+          <p id="session-msg" style="display:none;" class="session-msg"></p>
+        </div>
+      </section>
+
+
+      <!-- ── BACKUPS ────────────────────────────────────────────── -->
+      <section id="tab-backup" class="tab">
+        <div class="tab-header">
+          <h2>💾 Gestión de Backups (MySQL)</h2>
+        </div>
+        <p class="tab-desc">Administra las copias de seguridad de tu base de datos central. Los procesos grandes pueden tardar unos segundos.</p>
+        
+        <div class="wizard-step">
+          <div class="step-header">
+            <div class="step-badge">1</div>
+            <div>
+              <h3 class="step-title">Selecciona el Destino</h3>
+              <p class="step-desc">Elige dónde quieres que se procese la copia de seguridad.</p>
+            </div>
+          </div>
+          
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:24px;">
+            <label style="display:flex; align-items:center; gap:12px; cursor:pointer;" class="filter-select">
+              <input type="radio" name="backup-dest" value="download" checked style="accent-color:var(--c1);">
+              <span>Directo: Descargar fichero comprimido (.sql.gz)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:12px; cursor:pointer;" class="filter-select">
+              <input type="radio" name="backup-dest" value="hosting" style="accent-color:var(--c1);">
+              <span>Local: Alojar en servidor (/backups)</span>
+            </label>
+          </div>
+
+          <button id="btn-generate-backup" class="btn-launch" onclick="generateBackup()">
+            🚀 Generar Copia de Seguridad
+          </button>
+          
+          <div id="backup-status" style="display:none; margin-top:16px;">
+            <div style="display:flex; align-items:center; gap:10px; padding:16px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid var(--glass-border);">
+              <div id="backup-spinner" class="spinner" style="width:20px; height:20px; border:3px solid rgba(255,255,255,.2); border-top-color:var(--c3); border-radius:50%; animation: spin 1s linear infinite;"></div>
+              <span id="backup-text" style="font-size:14px; font-weight:600; color:rgba(255,255,255,.8);">Procesando volcado...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <!-- SOCKET.IO & APP -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

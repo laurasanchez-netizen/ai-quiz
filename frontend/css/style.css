@@ -1,0 +1,313 @@
+/* ============================================
+   PLAYER UI — Quiz IA Zamora Company v1.2.0
+   Mobile-first, full-screen experience
+   ============================================ */
+:root {
+  --c1: #881A43;  /* Vino      */
+  --c2: #017258;  /* Verde     */
+  --c3: #C19230;  /* Ocre      */
+  --c4: #267A83;  /* Petróleo  */
+  --g-blue:   #881A43; /* Reemplazo corporativo */
+  --g-red:    #267A83;
+  --g-yellow: #C19230;
+  --g-green:  #017258;
+  --g-dark:   #202124;
+  --g-gray:   #5F6368;
+  --g-light:  #F8F9FA;
+  --g-white:  #FFFFFF;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: var(--g-dark);
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 16px;
+  background: url('../assets/bg.jpg') center/cover no-repeat fixed;
+  position: relative;
+  z-index: 0;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: -1;
+}
+
+/* ── CONTENEDOR PRINCIPAL ── */
+.app-container {
+  width: 100%;
+  max-width: 800px;        /* más ancho */
+  min-height: 550px;       /* previene brincos de layout entre pantallas */
+  background: var(--g-white);
+  border-radius: 20px;
+  padding: 40px 32px 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  animation: fadeSlideIn 0.4s ease both;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+#view-login, #view-waiting, #view-question, #view-feedback, #view-gameover {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── LOGO / HEADER ── */
+.app-header { margin-bottom: 8px; text-align: center; }
+
+.logo-row {
+  font-size: 28px; font-weight: 900;
+  letter-spacing: -1px; user-select: none; margin-bottom: 4px;
+}
+.logo-g  { color: var(--g-blue);   }
+.logo-o1 { color: var(--g-red);    }
+.logo-o2 { color: var(--g-yellow); }
+.logo-g2 { color: var(--g-blue);   }
+.logo-l  { color: var(--g-green);  }
+.logo-e  { color: var(--g-red);    }
+.logo-quiz { color: var(--g-dark); font-size: 24px; font-weight: 700; }
+
+.app-name-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; margin-bottom: 4px;
+}
+.app-name { font-size: 14px; font-weight: 700; color: var(--g-dark); }
+.version-badge {
+  font-size: 10px; font-weight: 700; color: var(--g-white);
+  background: linear-gradient(135deg, var(--g-blue), #1a73e8);
+  padding: 2px 9px; border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(66,133,244,0.3);
+}
+
+.subtitle { color: var(--g-gray); font-size: 13px; margin-bottom: 24px; line-height: 1.5; text-align: center; }
+
+/* ── INPUTS ── */
+input {
+  display: block; width: 100%; padding: 15px 16px; margin-bottom: 14px;
+  border: 2px solid #DADCE0; border-radius: 12px; font-size: 17px;
+  font-weight: 600; text-align: center; outline: none;
+  transition: border-color .25s, box-shadow .25s; font-family: inherit;
+  color: var(--g-dark); background: var(--g-light);
+}
+input:focus { border-color: var(--g-blue); box-shadow: 0 0 0 3px rgba(66,133,244,.15); background: #fff; }
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* ── BOTONES ── */
+.btn {
+  display: block; width: 100%; padding: 16px; border: none; border-radius: 14px;
+  font-size: 17px; font-weight: 700; cursor: pointer; color: var(--g-white);
+  transition: transform .15s, opacity .15s, box-shadow .15s; font-family: inherit;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--g-blue), #1a73e8);
+  box-shadow: 0 4px 14px rgba(66,133,244,.35);
+}
+.btn-primary:hover { opacity: 0.92; }
+
+/* ── ERROR ── */
+.error-msg {
+  color: var(--g-red); font-size: 13px; font-weight: 600;
+  margin-top: 12px; padding: 10px 14px; background: #fce8e6;
+  border-radius: 8px; border-left: 4px solid var(--g-red); text-align: left;
+}
+
+/* ── SALA DE ESPERA ── */
+#view-waiting { text-align: center; padding: 10px 0; }
+.waiting-icon { font-size: 52px; margin-bottom: 14px; animation: bounce 1.4s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+#view-waiting h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.highlight-name { color: var(--g-blue); }
+
+.players-counter {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #e8f0fe; color: var(--g-blue); font-weight: 700;
+  font-size: 14px; padding: 8px 20px; border-radius: 30px; margin: 14px 0 10px;
+}
+.players-icon { font-size: 18px; }
+
+.countdown-box {
+  margin: 12px auto 8px; padding: 14px 24px;
+  background: linear-gradient(135deg, #202124, #3c4043);
+  border-radius: 16px; text-align: center;
+}
+.countdown-label { font-size: 12px; color: #aaa; margin-bottom: 4px; }
+.countdown-number {
+  font-size: 54px; font-weight: 900; color: var(--g-yellow);
+  animation: countPulse 1s ease infinite; line-height: 1;
+}
+.countdown-sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+@keyframes countPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+
+.loader {
+  margin: 22px auto; width: 42px; height: 42px;
+  border: 5px solid #e8f0fe; border-top: 5px solid var(--g-blue);
+  border-radius: 50%; animation: spin .9s linear infinite;
+}
+@keyframes spin { to {transform:rotate(360deg)} }
+.waiting-msg { color: var(--g-gray); font-size: 13px; line-height: 1.7; margin-top: 10px; }
+
+/* ── PREGUNTA ── */
+#view-question { padding: 4px 0; }
+
+.question-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+}
+.q-counter {
+  font-size: 12px; font-weight: 700; color: var(--g-gray);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.timer-badge {
+  background: var(--g-dark); color: var(--g-white);
+  padding: 7px 16px; border-radius: 30px; font-size: 15px;
+  font-weight: 800; display: flex; align-items: center; gap: 5px; min-width: 72px; justify-content: center;
+}
+
+.progress-bar {
+  width: 100%; height: 6px; background: #e8eaed;
+  border-radius: 10px; margin-bottom: 18px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--g-blue), var(--g-green));
+  border-radius: 10px; transition: width .6s ease;
+}
+
+.question-text {
+  font-size: 26px; font-weight: 700; color: var(--g-dark);
+  line-height: 1.45; margin-bottom: 32px; min-height: 56px;
+  text-align: center;
+}
+
+/* ── OPCIONES ── */
+.grid-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Verdadero/Falso: 1 columna de 2 botones anchos */
+.grid-options.boolean-grid {
+  grid-template-columns: 1fr;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.option-btn {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px;
+  padding: 20px 16px;
+  min-height: 140px;    /* más alto */
+  border: none; border-radius: 16px;
+  color: var(--g-white); font-size: 18px; font-weight: 700;
+  font-family: inherit; cursor: pointer; text-align: center;
+  line-height: 1.35; transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+.option-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.25); }
+.option-btn:active:not(:disabled) { transform: scale(0.96); }
+.option-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.option-btn.selected { outline: 4px solid rgba(255,255,255,0.75); }
+
+.opt-icon { font-size: 32px; }
+
+/* Colores corporativos correctos */
+.color-0 { background: linear-gradient(135deg, var(--c1), #5a0a2e); }
+.color-1 { background: linear-gradient(135deg, var(--c2), #004525); }
+.color-2 { background: linear-gradient(135deg, var(--c3), #a66820); }
+.color-3 { background: linear-gradient(135deg, var(--c4), #04505f); }
+
+/* Geometrías con tonos más claros */
+.color-0 .opt-icon { color: #f28ab0; text-shadow: 0 2px 4px rgba(0,0,0,.2); } 
+.color-1 .opt-icon { color: #4de8bc; text-shadow: 0 2px 4px rgba(0,0,0,.2); } 
+.color-2 .opt-icon { color: #fbd687; text-shadow: 0 2px 4px rgba(0,0,0,.2); } 
+.color-3 .opt-icon { color: #5ad3eb; text-shadow: 0 2px 4px rgba(0,0,0,.2); } 
+
+/* ── FEEDBACK ── */
+.feedback-view { text-align: center; padding: 24px 0; }
+.feedback-icon { font-size: 70px; animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) both; margin: 0 auto 18px; width: 140px; height: 140px; line-height: 140px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,.2); }
+.feedback-correct { background: #006235; }
+.feedback-incorrect { background: #7b0e40; }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.feedback-msg { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+.feedback-points { font-size: 22px; font-weight: 700; color: #006235; background: #e6f4ea; display: inline-block; padding: 6px 22px; border-radius: 40px; margin-bottom: 20px; }
+
+/* ── GAME OVER ── */
+.gameover-view { text-align: center; }
+.trophy { font-size: 64px; animation: swing 2s ease-in-out infinite; }
+@keyframes swing { 0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(5deg)} }
+.gameover-title { font-size: 27px; font-weight: 900; margin: 12px 0 4px; }
+
+/* PODIO */
+.podium-container {
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 10px; margin: 18px 0 4px; height: 210px;
+}
+.podium-slot { display: flex; flex-direction: column; align-items: center; width: 32%; }
+.podium-crown { font-size: 22px; animation: bounce 1.2s infinite; margin-bottom: 2px; }
+.podium-avatar { font-size: 30px; margin-bottom: 4px; }
+.winner-pulse { animation: winnerPulse 1.2s infinite; }
+@keyframes winnerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.podium-name { font-size: 11px; font-weight: 700; text-align: center; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.podium-score { font-size: 10px; font-weight: 600; color: var(--g-gray); margin-bottom: 5px; }
+.podium-bar { width: 100%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 17px; color: var(--g-white); border-radius: 8px 8px 0 0; }
+.bar-1st { background: linear-gradient(135deg,#FBBC05,#f09300); height: 90px; box-shadow: 0 -4px 18px rgba(251,188,5,.4); }
+.bar-2nd { background: linear-gradient(135deg,#9e9e9e,#757575); height: 64px; }
+.bar-3rd { background: linear-gradient(135deg,#c58134,#a66820); height: 48px; }
+
+/* RANKING */
+.ranking-list { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+.ranking-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--g-light); border-radius: 10px; padding: 11px 16px;
+  font-size: 15px; font-weight: 600; animation: fadeSlideIn .4s ease both;
+}
+.ranking-item:nth-child(1) { background:#fff8e1; border-left:5px solid #FBBC05; }
+.ranking-item:nth-child(2) { background:#f5f5f5; border-left:5px solid #9e9e9e; }
+.ranking-item:nth-child(3) { background:#fff3e0; border-left:5px solid #ff8c00; }
+.rank-pos { font-size: 20px; width: 34px; }
+.rank-name { flex: 1; text-align: left; color: var(--g-dark); padding: 0 8px; }
+.rank-score { color: var(--g-blue); font-weight: 800; font-size: 14px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 500px) {
+  body { padding: 8px; align-items: flex-start; }
+  .app-container { padding: 22px 16px 20px; border-radius: 16px; max-width: 100%; }
+  .question-text { font-size: 17px; }
+  .option-btn { min-height: 90px; font-size: 13px; padding: 12px 8px; }
+  .opt-icon { font-size: 18px; }
+  .grid-options { gap: 10px; }
+  .logo-row { font-size: 22px; }
+  .feedback-icon { font-size: 60px; }
+  .feedback-msg { font-size: 26px; }
+}
+
+@media (max-width: 380px) {
+  .option-btn { min-height: 78px; font-size: 12px; }
+  .question-text { font-size: 15px; }
+}
+
+@media (min-height: 700px) and (min-width: 500px) {
+  body { align-items: center; }
+}

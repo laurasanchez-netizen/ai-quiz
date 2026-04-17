@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Quiz Zamora Company — Presentador v1.6.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap">
+  <link rel="stylesheet" href="css/presenter.css">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+
+  <!-- AUDIO ELEMENTS -->
+  <audio id="audio-waiting" src="assets/audio/waiting.mp3" loop></audio>
+  <audio id="audio-tick" src="assets/audio/tick.mp3"></audio>
+  <audio id="audio-correct" src="assets/audio/correct.mp3"></audio>
+  <audio id="audio-fanfare" src="assets/audio/fanfare.mp3"></audio>
+
+  <!-- MUTE BUTTON -->
+  <button id="btn-mute" class="btn-mute" onclick="toggleMute()" title="Activar/Desactivar sonido">
+    <span id="mute-icon">🔊</span>
+  </button>
+
+  <!-- ===== VISTA: ESPERANDO JUGADORES ===== -->
+  <div id="view-waiting" class="p-view active">
+    <div class="p-logo-row">
+      <img src="assets/logo.png" alt="Zamora Company" class="p-logo">
+      <div class="p-brand">
+        <span class="p-brand-name">Zamora Company AI Quiz</span>
+        <span class="p-version">v1.6.0</span>
+      </div>
+    </div>
+    <div class="p-waiting-center">
+      <div class="p-waiting-pin-label">PIN de la Sala</div>
+      <div class="p-waiting-pin" id="p-pin-display">----</div>
+      <div class="p-waiting-qr" id="p-qr-waiting"></div>
+      <div class="p-player-count-row">
+        <span class="p-player-icon">👥</span>
+        <span id="p-player-count" class="p-player-count-num">0</span>
+        <span class="p-player-label">participantes en sala</span>
+      </div>
+      <div class="p-countdown-row" id="p-countdown-row" style="display:none;">
+        <span class="p-countdown-label">El juego comienza en</span>
+        <span id="p-countdown-num" class="p-countdown-num">30</span>
+        <span class="p-countdown-label">segundos</span>
+      </div>
+    </div>
+    <div class="p-footer">
+      <span id="p-quiz-title-waiting" class="p-quiz-title-footer">—</span>
+    </div>
+  </div>
+
+  <!-- ===== VISTA: PREGUNTA EN CURSO ===== -->
+  <div id="view-question" class="p-view">
+    <div class="p-question-header">
+      <div class="p-qnum-badge" id="p-qnum">1 / 5</div>
+      <div class="p-timer-bar-wrap">
+        <div class="p-timer-bar" id="p-timer-bar"></div>
+      </div>
+      <div class="p-timer-num" id="p-timer-num">20</div>
+    </div>
+    <div class="p-question-text" id="p-question-text">
+      ¿Cuál es la capital de Francia?
+    </div>
+    <div class="p-options-grid" id="p-options-grid">
+      <!-- opciones inyectadas por JS -->
+    </div>
+    <div class="p-answered-row">
+      <span class="p-answered-icon">✍️</span>
+      <span id="p-answered-count" class="p-answered-num">0</span>
+      <span class="p-answered-label">respuestas recibidas</span>
+    </div>
+  </div>
+
+  <!-- ===== VISTA: RESPUESTA REVELADA ===== -->
+  <div id="view-answer" class="p-view">
+    <div class="p-answer-header">
+      <div id="p-answer-verdict" class="p-answer-verdict">⏱ Tiempo agotado</div>
+    </div>
+    <div class="p-options-grid revealed" id="p-options-revealed">
+      <!-- opciones con correcta destacada -->
+    </div>
+    <div class="p-mini-ranking" id="p-mini-ranking">
+      <!-- top 3 jugadores parciales -->
+    </div>
+  </div>
+
+  <!-- ===== VISTA: RANKING FINAL / PODIO ===== -->
+  <div id="view-gameover" class="p-view">
+    <div class="p-gameover-header">
+      <span class="p-trophy">🏆</span>
+      <h1 class="p-gameover-title">¡Partida Finalizada!</h1>
+    </div>
+    <div class="p-podium" id="p-podium">
+      <!-- podio generado por JS -->
+    </div>
+    <div class="p-full-ranking" id="p-full-ranking">
+      <!-- ranking completo -->
+    </div>
+  </div>
+
+  <!-- SOCKET.IO & APP -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/presenter.js"></script>
+</body>
+</html>
